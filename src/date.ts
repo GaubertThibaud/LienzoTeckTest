@@ -14,7 +14,7 @@ class DateCalculator {
     }
 
     public runCalcul(): void {
-        console.log("DATE: " + this.inputDate);
+        console.log("INPUT DATE: " + this.inputDate);
         console.log("TIME TO ADD: " + this.turnaroundTime);
 
         if(!this.checkPostingInWorkingDay()) {
@@ -25,16 +25,15 @@ class DateCalculator {
             return;
         }
 
-        this.calculNewDate();
+        let dateResult = this.calculNewDate();
+        console.log("DATE RESULT: " + dateResult.toString());
     }
 
-    public calculNewDate() {
+    public calculNewDate(): Date {
         const hours = this.inputDate.getHours();
         let addDays = Math.floor(this.turnaroundTime / this.workingTime);
         let addHours = this.turnaroundTime % this.workingTime;
         let dateResult = this.inputDate;
-
-        
 
         if (hours + addHours > this.workingTimeEnd) {
             addDays ++;
@@ -44,7 +43,19 @@ class DateCalculator {
             dateResult.setHours(hours + addHours);
         }
 
+        if (dateResult.getDay() + addDays >= 6) {
+            let newAddDays = addDays % 5;
+            let addWeeks = Math.floor(addDays / 5);
+            // In this case we have to add 1 week more (so we add 2 days to the newAddDays since we going from base5 to base7)
+            if (dateResult.getDay() + newAddDays >= 6) {
+                newAddDays = newAddDays + 2;
+            }
+            dateResult.setDate(dateResult.getDate() + newAddDays + (addWeeks * 7));
+        } else {
+            dateResult.setDate(dateResult.getDate() + addDays);
+        }
 
+        return dateResult;
     }
 
 
@@ -122,4 +133,18 @@ const testSix = new DateCalculator(
 testSix.runCalcul();
 console.log("");
 
-console.log("2025-09-26T22:24:00 -- " + new Date("2025-09-26T22:24:00").getDay());
+console.log("----- TEST 7 -----");
+const testSeven = new DateCalculator(
+    new Date("2025-09-29T16:24:00"),
+    19
+);
+testSeven.runCalcul();
+console.log("");
+
+console.log("----- TEST 8 -----");
+const testEight = new DateCalculator(
+    new Date("2025-09-26T16:24:00"),
+    19
+);
+testEight.runCalcul();
+console.log("");
